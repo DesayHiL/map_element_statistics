@@ -1,0 +1,13 @@
+{
+  "accessLen": 863,
+  "refreshLen": 923,
+  "jwtExp": "parse-fail",
+  "accessVerifyCode": 200,
+  "accessVerifyMsg": "操作成功",
+  "refreshResult": {
+    "code": 500,
+    "hasData": false,
+    "raw": "{\"code\":500,\"msg\":\"服务异常，请联系管理员处理！\",\"data\":null,\"success\":false}"
+  }
+}
+两种途径均未获得可用 token

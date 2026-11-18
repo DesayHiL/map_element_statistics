@@ -1,0 +1,47 @@
+# 凭证与密钥（严禁入库）
+amap_key.js
+token.txt
+token_prod.txt
+supply_token.txt
+uat_supply_token.txt
+bj_refresh.txt
+
+# 数据与产物（只上传核心代码）
+data/
+out/
+node_modules/
+archive/
+交付_2026-10-17_v6/
+external-data/
+kuandeng/
+odd-pipeline/
+platform-tools/
+odd_plan.json
+odd_route_rows_v2.json
+odd_route_rows_v3.json
+odd_route_rows_v3.json.bak_912_pre
+existing_ptv.json
+batch_upload_log.json
+data_5g_*.json
+sl.json
+sl_*.json
+_tmp_scan_kd.js
+tmp_*.json
+tmp_*.js
+deck-spec.json
+System.IO.Compression.WrappedStream
+
+# Python
+.venv*/
+__pycache__/
+*.pyc
+
+# 工具缓存/临时目录
+.lark-slides/
+.pwtmp/
+.workbuddy/
+
+tools/diag_circle2.py
+tools/route_kuandeng_coverage.py
+tools/bj_auth.js
+tools/diag.log

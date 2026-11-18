@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>单条路线交付验收：流程与排班</title>
+<style>
+  :root{
+    --ink:#2C2C2A; --ink2:#5F5E5A; --ink3:#888780;
+    --line:#D3D1C7; --bg:#F1EFE8;
+    --blue:#185FA5; --blue-bg:#EFF5FC;
+    --green:#3B6D11; --green-bg:#EAF3DE;
+    --amber:#854F0B; --amber-bg:#FAEEDA;
+    --red:#A32D2D; --red-bg:#FCEBEB;
+  }
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,'Segoe UI','Microsoft YaHei',sans-serif;color:var(--ink);background:#fff;margin:0;-webkit-font-smoothing:antialiased}
+  main{max-width:1000px;margin:0 auto;padding:40px 28px 72px}
+
+  .head{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:26px}
+  h1{font-size:24px;margin:0 0 8px;letter-spacing:.5px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--ink2)}
+  .tag.core{background:var(--blue);color:#fff}
+
+  h2{font-size:18px;margin:46px 0 14px;padding-left:12px;border-left:4px solid var(--blue);line-height:1.3}
+  h3{font-size:15px;margin:30px 0 8px;color:var(--blue);letter-spacing:.3px}
+  h4{font-size:13.5px;margin:18px 0 6px;color:var(--ink2);letter-spacing:.3px}
+  p{font-size:14px;line-height:1.75;margin:8px 0}
+  ul{margin:8px 0;padding-left:22px}
+  li{font-size:14px;line-height:1.75;margin:5px 0}
+  b{font-weight:600}
+  .sub{font-size:12.5px;color:var(--ink3)}
+  code{background:var(--bg);padding:1px 5px;border-radius:4px;font-size:12.5px}
+
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;line-height:1.6}
+  th{background:var(--bg);font-weight:600}
+  td.k{white-space:nowrap;font-weight:600}
+  td.num{white-space:nowrap}
+  td.src{white-space:nowrap;font-size:12.5px;color:var(--ink2)}
+  .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;vertical-align:1px}
+  .pill.fatal{background:var(--red-bg);color:var(--red)}
+  .pill.blue{background:var(--blue-bg);color:var(--blue)}
+  .pill.green{background:var(--green-bg);color:var(--green)}
+
+  .box{border-radius:10px;padding:14px 18px;font-size:13.5px;line-height:1.75;margin:12px 0}
+  .box.note{background:var(--amber-bg)}
+  .box.pass{background:var(--green-bg)}
+  .box.info{background:var(--blue-bg)}
+
+  .chk{list-style:none;padding:0;margin:10px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:720px){.chk{grid-template-columns:1fr}}
+  .chk li{background:#FAFAF7;border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;padding:9px 12px;font-size:13.5px;display:flex;gap:8px;align-items:flex-start}
+  .chk .s{font-weight:700;color:var(--green);flex:none}
+
+  .fig{max-width:680px;margin:16px auto}
+  footer{margin-top:52px;font-size:12.5px;color:var(--ink3);border-top:1px solid var(--line);padding-top:14px;line-height:1.75}
+</style>
+</head>
+<body>
+<main>
+
+<div class="head">
+  <h1>单条路线交付验收：流程与排班</h1>
+  <div class="tags">
+    <span class="tag core">依据《川行无人车智驾验收测试标准》</span>
+    <span class="tag">v6.1 · 2026-10-10</span>
+    <span class="tag">单条路线来回 &gt; 20 次</span>
+  </div>
+</div>
+
+<h2>一、验收流程</h2>
+
+<p>门式流程：<b>上一道门通过后才能进入下一道；任一道不通过，就地返修后重验，不进入下一阶段。</b>前三道门的放行判据取自《川行》原文，不由本标准自定。</p>
+
+<div class="fig">
+<svg viewBox="0 0 680 640" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,-apple-system,'Microsoft YaHei',sans-serif">
+<defs>
+<marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#185FA5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="ag" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#3B6D11" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#A32D2D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<rect x="60" y="10" width="280" height="40" rx="20" fill="#F1EFE8" stroke="#B9B6AB"/>
+<text x="200" y="34" font-size="12.5" font-weight="600" fill="#2C2C2A" text-anchor="middle">输入：单条路线（起点 — 途经点 — 终点）</text>
+<line x1="200" y1="50" x2="200" y2="60" stroke="#185FA5" stroke-width="1.6" marker-end="url(#ab)"/>
+
+<rect x="60" y="62" width="280" height="48" rx="8" fill="#EFF5FC" stroke="#185FA5"/>
+<text x="200" y="81" font-size="12" font-weight="600" fill="#0C447C" text-anchor="middle">G1 · HIL 逻辑测试（真实域控上台架）</text>
+<text x="200" y="99" font-size="10.5" fill="#185FA5" text-anchor="middle">跑逻辑用例：状态机 / MRM / 接管 / 上下电 / 远遥</text>
+<line x1="200" y1="110" x2="200" y2="120" stroke="#185FA5" stroke-width="1.6" marker-end="url(#ab)"/>
+
+<path d="M200 122 L270 144 L200 166 L130 144 Z" fill="#FCFCFA" stroke="#8B897E"/>
+<text x="200" y="148" font-size="11.5" fill="#44423C" text-anchor="middle">通过？</text>
+<line x1="200" y1="166" x2="200" y2="176" stroke="#185FA5" stroke-width="1.6" marker-end="url(#ab)"/>
+<text x="207" y="174" font-size="9.5" fill="#3B6D11">是</text>
+<line x1="270" y1="144" x2="348" y2="144" stroke="#A32D2D" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+
+<rect x="60" y="178" width="280" height="48" rx="8" fill="#EFF5FC" stroke="#185FA5"/>
+<text x="200" y="197" font-size="12" font-weight="600" fill="#0C447C" text-anchor="middle">G2 · SIL 地图验证（规控跑服务器）</text>
+<text x="200" y="215" font-size="10.5" fill="#185FA5" text-anchor="middle">跑虚拟地图遍历：区域遍历 / 途经点 / 重规划</text>
+<line x1="200" y1="226" x2="200" y2="236" stroke="#185FA5" stroke-width="1.6" marker-end="url(#ab)"/>
+
+<path d="M200 238 L270 260 L200 282 L130 260 Z" fill="#FCFCFA" stroke="#8B897E"/>
+<text x="200" y="264" font-size="11.5" fill="#44423C" text-anchor="middle">通过？</text>
+<line x1="200" y1="282" x2="200" y2="292" stroke="#185FA5" stroke-width="1.6" marker-end="url(#ab)"/>
+<text x="207" y="290" font-size="9.5" fill="#3B6D11">是</text>
+<line x1="270" y1="260" x2="348" y2="260" stroke="#A32D2D" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+
+<rect x="60" y="294" width="280" height="48" rx="8" fill="#EFF5FC" stroke="#185FA5"/>
+<text x="200" y="313" font-size="12" font-weight="600" fill="#0C447C" text-anchor="middle">G3 · 封闭场地验收（整车进场）</text>
+<text x="200" y="331" font-size="10.5" fill="#185FA5" text-anchor="middle">跑 19 项场地试验 + 法规 / 路权用例</text>
+<line x1="200" y1="342" x2="200" y2="352" stroke="#185FA5" stroke-width="1.6" marker-end="url(#ab)"/>
+
+<path d="M200 354 L270 376 L200 398 L130 376 Z" fill="#FCFCFA" stroke="#8B897E"/>
+<text x="200" y="380" font-size="11.5" fill="#44423C" text-anchor="middle">通过？</text>
+<line x1="200" y1="398" x2="200" y2="408" stroke="#185FA5" stroke-width="1.6" marker-end="url(#ab)"/>
+<text x="207" y="406" font-size="9.5" fill="#3B6D11">是</text>
+<line x1="270" y1="376" x2="348" y2="376" stroke="#A32D2D" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+
+<rect x="60" y="410" width="280" height="48" rx="8" fill="#EAF3DE" stroke="#3B6D11"/>
+<text x="200" y="429" font-size="12" font-weight="600" fill="#173404" text-anchor="middle">G4 · 排班采集（本文件重点）</text>
+<text x="200" y="447" font-size="10.5" fill="#3B6D11" text-anchor="middle">21 个来回 · 功能测试 + 录制 ROS bag</text>
+<line x1="200" y1="458" x2="200" y2="468" stroke="#3B6D11" stroke-width="1.6" marker-end="url(#ag)"/>
+
+<rect x="60" y="470" width="280" height="48" rx="8" fill="#EAF3DE" stroke="#3B6D11"/>
+<text x="200" y="489" font-size="12" font-weight="600" fill="#173404" text-anchor="middle">G5 · 评测器评测地图</text>
+<text x="200" y="507" font-size="10.5" fill="#3B6D11" text-anchor="middle">感知静态要素 ↔ 宽凳真值全量比对</text>
+<line x1="200" y1="518" x2="200" y2="528" stroke="#3B6D11" stroke-width="1.6" marker-end="url(#ag)"/>
+
+<path d="M200 530 L270 552 L200 574 L130 552 Z" fill="#FCFCFA" stroke="#8B897E"/>
+<text x="200" y="556" font-size="11" fill="#44423C" text-anchor="middle">全部闭环？</text>
+<line x1="200" y1="574" x2="200" y2="584" stroke="#3B6D11" stroke-width="1.6" marker-end="url(#ag)"/>
+<text x="207" y="582" font-size="9.5" fill="#3B6D11">是</text>
+<line x1="270" y1="552" x2="400" y2="552" stroke="#A32D2D" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+<text x="298" y="546" font-size="9.5" fill="#A32D2D">否</text>
+<rect x="404" y="534" width="252" height="36" rx="8" fill="#FCEBEB" stroke="#D9A0A0"/>
+<text x="530" y="556" font-size="10.5" fill="#A32D2D" text-anchor="middle">返工失败项 → 复验（不重跑全程）</text>
+
+<rect x="60" y="586" width="280" height="44" rx="22" fill="#EAF3DE" stroke="#3B6D11"/>
+<text x="200" y="612" font-size="12.5" font-weight="600" fill="#173404" text-anchor="middle">移交运营</text>
+
+<line x1="348" y1="144" x2="348" y2="376" stroke="#A32D2D" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text x="358" y="252" font-size="10.5" fill="#A32D2D">否：就地返修，</text>
+<text x="358" y="270" font-size="10.5" fill="#A32D2D">重验通过才进下一阶段</text>
+</svg>
+</div>
+
+<h3>1.1 各阶段做什么、按什么放行</h3>
+
+<table>
+  <tr><th>阶段</th><th>做什么</th><th>放行判据</th><th>出处</th></tr>
+  <tr>
+    <td class="k">G1<br>HIL 逻辑测试</td>
+    <td>真实域控上台架，实时仿真注入场景；功能逻辑与状态机、MRM、失效接管、交通合规、上下电压力、故障降级、标定、远遥</td>
+    <td>冒烟执行率 / 通过率 <b>100%</b>；<b>无 P0 安全缺陷</b>、P1 清零；<b>基础状态逻辑问题 0</b>；远遥控制权切换类用例 <b>0 失败</b></td>
+    <td class="src">W1</td>
+  </tr>
+  <tr>
+    <td class="k">G2<br>SIL 地图验证</td>
+    <td>规控跑服务器，虚拟地图闭环；区域地图遍历、途经点、路径重规划、定位异常</td>
+    <td><b>区域地图遍历率 ≥ 98%</b>、关键节点 / 路线点 <b>100% 覆盖</b>；路径重规划成功率、定位异常安全降级触发率 <b>100%</b>；输出《区域地图验收测试报告》</td>
+    <td class="src">W1</td>
+  </tr>
+  <tr>
+    <td class="k">G3<br>封闭场地验收</td>
+    <td>整车在封闭测试场，环境可控、场景可摆设；19 项场地试验 + 法规 / 路权用例</td>
+    <td>安全策略与远程接管稳定，<b>无 P0 / P1 阻塞</b>；法规 / 路权用例<b>执行率 100%</b></td>
+    <td class="src">W1 / GB/T 41798-2022</td>
+  </tr>
+  <tr>
+    <td class="k">G4<br>排班采集</td>
+    <td>按 §2.2 排班表出车，21 个来回（空载 / 满载覆盖）；<b>每个来回既是功能测试的执行遍，也全程录制 ROS bag</b></td>
+    <td>来回 &gt; 20 次且<b>累计实车里程 ≥ 200 km（含空载与满载）</b>；关键场景反复验证；<b>每遍均为有效遍</b>；干预 / 接管 / MRM 事件 <b>100% 记录并归因</b></td>
+    <td class="src">本文件 §2 / W1 · 验收体系 1.4</td>
+  </tr>
+  <tr>
+    <td class="k">G5<br>评测地图</td>
+    <td>评测器离线全量比对（感知静态要素 ↔ 宽凳真值）；差异逐条归因；一致项抽检复核</td>
+    <td><b>差异 100% 归因闭环</b>；一致项抽检<b>未发现评测器漏检</b></td>
+    <td class="src">本文件 §2.4</td>
+  </tr>
+</table>
+
+<h2>二、排班</h2>
+
+<h3>2.1 为什么这么排</h3>
+
+<p>排班不是凑时间，是把上位标准<b>写死的配额</b>落到具体时段。总量、分布、下限都是《川行》明文，排班人无权自定。</p>
+
+<table>
+  <tr><th>序</th><th>约束</th><th>上位标准要求</th><th>出处</th></tr>
+  <tr><td class="k">①</td><td class="k">总量</td><td>单条路线来回 <b>&gt; 20 次</b></td><td class="src">W1 · 2.1</td></tr>
+  <tr><td class="k">②</td><td class="k">高峰</td><td>早 / 午 / 晚高峰<b>各至少 2 次</b></td><td class="src">W1 · 2.2.1</td></tr>
+  <tr><td class="k">③</td><td class="k">时段比例</td><td>其余时段按 <b>3 : 3 : 4</b>；<b>上、下午各 ≥ 1 次</b>，<b>夜间 ≥ 2 次</b></td><td class="src">W1 · 2.2.1</td></tr>
+  <tr><td class="k">④</td><td class="k">固定运营</td><td>客户有固定发车时间时，以客户发车时间为主，<b>不低于 50 km 或 3 次</b></td><td class="src">W1 · 2.2.2</td></tr>
+  <tr><td class="k">⑤</td><td class="k">时段划分</td><td>昼夜按当地日出日落划分；同一自然日累计覆盖 <b>td1 / td2 / tn1 / tn2</b></td><td class="src">GB/T 44719-2024 · 4.4</td></tr>
+  <tr><td class="k">⑥</td><td class="k">里程与载荷</td><td>单条路线<b>实车测试不少于 200 km，含空载与满载</b>；关键场景需反复验证</td><td class="src">W1 · 验收体系 1.4</td></tr>
+</table>
+
+<div class="box info"><b>从约束到「21 个来回、各时段几个」的推导（约束是原文，分配是算出来的，可复核）：</b><br>
+① 高峰：早 / 午 / 晚各 ≥ 2 次 —— 早、晚通勤流更强各上浮 1，即早 3 / 午 2 / 晚 3，共 8 个；<br>
+② 其余时段按 3 : 3 : 4 分给上午 / 下午 / 夜间：剩余 21 − 8 = 13 个，13 × 3/10 ≈ 4（上午）、13 × 3/10 ≈ 4（下午）、13 × 4/10 ≈ 5（夜间）；<br>
+③ 校验：3 + 4 + 2 + 4 + 3 + 5 = 21 ✓；高峰各 ≥ 2 ✓；上下午各 ≥ 1 ✓；夜间 ≥ 2 ✓；其余 4 : 4 : 5 ≈ 3 : 3 : 4 ✓；<br>
+④ <b>短路线追加规则</b>：若 21 × 2 × 单程里程 &lt; 200 km（即单程 &lt; 4.8 km），来回数上调至累计里程 ≥ 200 km 为止（约束 ⑥）。
+</div>
+
+<h3>2.2 排班总表（无固定运营时间 · 默认配置）</h3>
+
+<p>取 <b>21 个来回</b>（满足 &gt; 20 次）分摊：三个高峰各 ≥ 2，夜间 ≥ 2，其余按 3 : 3 : 4 分给上午 / 下午 / 夜间。</p>
+
+<table>
+  <tr><th>序</th><th>时段</th><th>时间窗口</th><th>来回</th><th>单程遍</th><th>这么排的依据</th><th>本班次测试内容</th><th>对应验收指标</th></tr>
+  <tr>
+    <td class="k">1</td><td class="k">早高峰</td><td class="k">07:00–09:00</td><td>3</td><td>6</td>
+    <td>高峰各 ≥ 2 次，取 3 覆盖通勤高峰段</td>
+    <td>拥堵跟车与起步、行人 / 非机动车混入、路口多相位信号</td>
+    <td class="src">DDT 合规 <span class="pill blue">REQ-R-008</span></td>
+  </tr>
+  <tr>
+    <td class="k">2</td><td class="k">上午平峰</td><td class="k">09:30–11:30</td><td>4</td><td>8</td>
+    <td>3 : 3 : 4 中上午份额；兼满足「上午 ≥ 1 次」</td>
+    <td><b>基准采集</b>：光照与交通最稳，作为评测器比对主数据集</td>
+    <td class="src">地图静态数据全项 <span class="pill green">§2.4</span></td>
+  </tr>
+  <tr>
+    <td class="k">3</td><td class="k">午高峰</td><td class="k">11:30–13:30</td><td>2</td><td>4</td>
+    <td>高峰各 ≥ 2 次（取下限）</td>
+    <td>路口通行、车辆停走、短时变密车流</td>
+    <td class="src">DDT 合规 + 后援 <span class="pill blue">REQ-R-008/010</span></td>
+  </tr>
+  <tr>
+    <td class="k">4</td><td class="k">下午平峰</td><td class="k">14:00–16:30</td><td>4</td><td>8</td>
+    <td>3 : 3 : 4 中下午份额；兼满足「下午 ≥ 1 次」</td>
+    <td>与序 2 作<b>同向重复性校验</b>（版本不变、两次独立采集）</td>
+    <td class="src">可靠性 <span class="pill green">§2.4</span></td>
+  </tr>
+  <tr>
+    <td class="k">5</td><td class="k">晚高峰</td><td class="k">17:00–19:30</td><td>3</td><td>6</td>
+    <td>高峰各 ≥ 2 次；跨越日落，兼顾白天与夜间低照</td>
+    <td>逆光、大型车遮挡、拥堵跟车、路口饱和流</td>
+    <td class="src">DDT 合规 + 地图 <span class="pill blue">REQ-R-008</span></td>
+  </tr>
+  <tr>
+    <td class="k">6</td><td class="k">夜间</td><td class="k">19:30–23:00</td><td>5</td><td>10</td>
+    <td>夜间 ≥ 2 次，取 5 承接 3 : 3 : 4 中最大份额</td>
+    <td>低照下要素感知与灯光依赖、隧道口、无路灯段</td>
+    <td class="src">夜间地图与 DDT <span class="pill green">§2.4</span></td>
+  </tr>
+  <tr>
+    <td class="k">合计</td><td>—</td><td>—</td><td><b>21</b></td><td><b>42</b></td>
+    <td colspan="1">满足总量 &gt; 20、高峰各 ≥ 2、夜间 ≥ 2、上下午各 ≥ 1、其余 3 : 3 : 4</td>
+    <td>td1 / td2 / tn1 / tn2 时段组合全覆盖</td>
+    <td class="src">通过标准 §2.4</td>
+  </tr>
+</table>
+
+<p class="sub">执行顺序：序 1 + 2 同日连做（早 → 上午）；序 3 + 4 同日连做（午 → 下午）；序 5 + 6 同日连做（晚 → 夜间）。每个来回<b>先去程后返程，同一辆车、同一批人，中途不换车</b>。</p>
+
+<p class="sub">载荷与专项（落在来回维度，不额外占时段）：① 空载 / 满载交替安排（如奇数来回空载、偶数来回满载），保证 200 km 内两种工况均覆盖；② AEB 误触发观察每遍进行；③ 端点、复杂路口、施工段等<b>关键场景须在多个时段反复出现并验证结论一致</b>；④ 泛化场景（cut-in、异形车、临时障碍等）随真实交通流自然出现，逐次记录归因。</p>
+
+<h3>2.3 每个班次做什么测试内容</h3>
+
+<h4>2.3.1 每遍采集（车端）</h4>
+
+<table>
+  <tr><th>类别</th><th>要求</th><th>出处</th></tr>
+  <tr><td class="k">ROS bag</td><td>全程录制：感知静态要素（停止线 / 标线 / 车道 / 限速）、定位与组合导航、感知结果、时间戳同步</td><td class="src">W1 · 数据落盘</td></tr>
+  <tr><td class="k">运动状态</td><td>采样与存储 ≥ 50 Hz；速度精度 ≤ 0.1 km/h、位置 ≤ 0.1 m、加速度 ≤ 0.1 m/s²</td><td class="src">GB/T 44719-2024</td></tr>
+  <tr><td class="k">视频</td><td>≥ 1920×1080、帧率 ≥ 30 f/s</td><td class="src">GB/T 44719-2024</td></tr>
+  <tr><td class="k">事件记录</td><td>干预、接管、介入请求、MRM 事件<b>逐次记录时间戳并归因，100% 记录</b></td><td class="src">GB/T 44719-2024 / W1</td></tr>
+  <tr><td class="k">端点操作</td><td>起点、终点、每个途经点各停留 10 min 静态确认并记录</td><td class="src">本标准</td></tr>
+</table>
+
+<h4>2.3.2 功能测试（随车 / 远程，每个来回都执行）</h4>
+
+<table>
+  <tr><th>项</th><th>验证什么</th><th>验收指标</th><th>出处</th></tr>
+  <tr>
+    <td class="k">端点通过性<br><span class="pill fatal">关键项</span></td>
+    <td>起点、终点、<b>全部途经点</b>：停靠精度、进出通道、掉头 / 上下客区、与接驳点衔接</td>
+    <td>逐个全部合格，<b>零缺陷</b></td>
+    <td class="src">本标准 / REQ-F-017</td>
+  </tr>
+  <tr><td class="k">DDT 执行合规</td><td>不骑轧车道分界线及边缘线、不越停止线、不超速、不违规占用应急车道、按优先通行权通过路口</td><td>全过程无违规</td><td class="src">REQ-R-008</td></tr>
+  <tr><td class="k">DDT 综合表现</td><td>适应他车行驶状态；除保持安全距离与换道外稳定于车道内；不无故紧急制动或转向</td><td>全过程无异常</td><td class="src">REQ-R-009</td></tr>
+  <tr><td class="k">DDT 后援</td><td>计划事件提前识别响应；介入请求持续发出且期间持续执行 DDT；MRM 期间持续执行 DDT、允许干预并有退出提示</td><td>事件 100% 记录并归因</td><td class="src">REQ-R-010 / 011</td></tr>
+  <tr><td class="k">状态提示</td><td>就绪 / 激活有目视可见光学提示；转换、失效、介入请求、MRM 提示明显且可区分</td><td>全过程可辨</td><td class="src">REQ-R-012</td></tr>
+  <tr><td class="k">无责任事故</td><td>无承担责任的交通事故、无非策略性干预</td><td class="num">0 次</td><td class="src">REQ-R-007</td></tr>
+  <tr><td class="k">AEB 误触发</td><td>全程观察 AEB 有无误触发（无真实目标下的自动制动）</td><td class="num">0 次</td><td class="src">W1 · 验收体系 1.4</td></tr>
+  <tr><td class="k">MRC 最小风险</td><td>按计划注入严重故障（远遥配合）：安全靠边停车、双闪与语音警示、故障信息自动上传远控前台；碰撞后弹性波介入刹停并上报</td><td>全部动作按序完成</td><td class="src">W1 · 验收体系 1.3</td></tr>
+  <tr><td class="k">关键场景反复验证</td><td>端点、复杂路口、施工段等关键场景在多个时段重复出现</td><td>多次验证结论一致</td><td class="src">W1 · 验收体系 1.4</td></tr>
+  <tr><td class="k">云-车-远遥协同</td><td>远控接管、任务下发、链路视频等全链协同在真实道路下工作</td><td>功能正常，0 失败</td><td class="src">W1 · 测试模块架构</td></tr>
+</table>
+
+<h4>2.3.3 离线评测（评测器）</h4>
+
+<p>把每一遍采回的 ROS bag 交给评测器<b>离线回放</b>：把<b>感知到的静态要素</b>与<b>宽凳高精真值</b>逐项空间匹配、逐项比对属性（STOPLINE / DIVIDER / LANE / ROAD_LINK）——<b>全量比对，不抽样</b>。输出分两路：</p>
+
+<ul>
+  <li><b>差异项</b> —— 逐条人工校核，判真差异或误检。真差异按三种去向处置，<b>没有「放过」</b>：地图错 → 修图并复验（阻断项）；感知错 → 转问题单跟踪闭环；误检 → 剔除并记录（评测器规则优化线索）。</li>
+  <li><b>一致项</b> —— 从评测器判为「一致」的要素中按里程分层抽样复核。这一步补的是评测器的<b>漏报</b>：只校核差异项只能发现误报，发现不了漏报；<b>若抽检发现漏检，评测器结论不可采信，转全量人工复核</b>。抽检不产生任何容忍额度。</li>
+</ul>
+
+<h4>2.3.4 有效遍的条件</h4>
+
+<p>每一遍须同时满足下列条件，才计为 <b>有效遍</b>；否则该遍作废、就地补采：</p>
+
+<ul class="chk">
+  <li><span class="s">✓</span> 全程按规划路径行驶，无路段绕行或跳过</li>
+  <li><span class="s">✓</span> 无安全接管、无非策略性干预</li>
+  <li><span class="s">✓</span> ROS bag 完整（静态要素、定位 / 组合导航、时间同步）</li>
+  <li><span class="s">✓</span> 定位全程有效，无丢失或大幅跳变</li>
+  <li><span class="s">✓</span> 起终点及全部途经点按规范停留并完成记录</li>
+</ul>
+
+<h3>2.4 验收指标</h3>
+
+<h4>2.4.1 地图静态数据（G5 判据）</h4>
+
+<p>地图侧采用<b>缺陷闭环制，不设容忍额度</b>——评测器全量比对已把差异穷举出来，每条都是有效发现，必须归因闭环。</p>
+
+<table>
+  <tr><th>判据项</th><th>判据（阈值）</th><th>出处</th></tr>
+  <tr><td class="k">平面位置绝对精度</td><td class="num">≤ 1.0 m</td><td class="src">自然资源部 · 高精地图数据规范</td></tr>
+  <tr><td class="k">平面位置相对精度</td><td class="num">≤ 0.2 m / 100 m</td><td class="src">中国测绘学会 · 高精地图产品规格</td></tr>
+  <tr><td class="k">停止线位置与灯控属性</td><td>全部与真值一致，差异逐条闭环</td><td class="src">本标准</td></tr>
+  <tr><td class="k">标线线型、颜色一致率</td><td class="num">100%（全量比对，无容忍额度）</td><td class="src">本标准</td></tr>
+  <tr><td class="k">车道数、限速一致率</td><td class="num">100%（全量比对，无容忍额度）</td><td class="src">本标准</td></tr>
+  <tr><td class="k">差异闭环率</td><td class="num">100% 归因处置完毕</td><td class="src">本标准</td></tr>
+  <tr><td class="k">评测器漏检验证</td><td>一致项抽检未发现漏检</td><td class="src">本标准</td></tr>
+</table>
+
+<h4>2.4.2 通过标准（可移交运营）</h4>
+
+<div class="box pass">
+<b>单条路线验收通过 ＝ 同时满足下列六项：</b><br>
+① <b>前置门全部放行</b>：G1 / G2 / G3 的放行判据均已满足并取得对应报告；<br>
+② <b>采集完成</b>：完成 <b>≥ 21 个来回</b>（&gt; 20 次）且<b>累计实车里程 ≥ 200 km（含空载与满载）</b>；td1 / td2 / tn1 / tn2 时段组合覆盖，每遍均为有效遍；<br>
+③ <b>端点与途经点</b>：起点、终点及全部途经点逐个确认合格，零缺陷；<br>
+④ <b>道路表现</b>：无责任事故、无非策略性干预、无不合规（越停止线 / 超速 / 骑轧车道线 / 违规占道）、AEB 无误触发；关键场景反复验证结论一致；事件 100% 记录并归因；<br>
+⑤ <b>地图静态数据</b>：几何精度达 §2.4.1 判据，要素一致率 100%，差异 100% 归因闭环，抽检未发现评测器漏检；<br>
+⑥ <b>评审</b>：未触发暂停退出条件（碰撞、≥ 1 次安全接管、算法节点 core、路线与地图偏差、≥ 2 个高优先级问题），DMG 评审为绿。<br>
+任一项不满足即<b>不通过</b>；返工粒度为失败项（单个端点、单个要素点段、单个功能项），不重跑全程；复验通过后重新判定。
+</div>
+
+<footer>
+单条路线交付验收 · v6.1 · 2026-10-10 · 仅两部分：一、验收流程（门式流程图 + 各阶段放行判据）；二、排班（依据 / 推导 / 总表 / 班次测试内容 / 验收指标）。v6.1 补：G4 明确为功能测试 + 录制并行；新增约束⑥（≥200 km 含空载满载）与 21 个来回的算术推导；功能测试项补 AEB 误触发 / MRC / 关键场景反复验证 / 云-车-远遥协同<br>
+上位依据：<code>《川行无人车智驾验收测试标准》</code> · <code>GB/T 41798-2022</code> · <code>GB/T 44719-2024</code>
+</footer>
+
+</main>
+</body>
+</html>

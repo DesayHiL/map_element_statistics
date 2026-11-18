@@ -1,0 +1,2 @@
+$c = Get-CimInstance Win32_Process -Filter "Name='chrome.exe'" | Where-Object { $_.CommandLine -like '*pwtmp*' }
+if ($c) { $c | ForEach-Object { Write-Output ("PID " + $_.ProcessId) } } else { Write-Output "none" }

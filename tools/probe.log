@@ -1,0 +1,19 @@
+{
+ "url": "https://test-bluejet.cxzyuan.com/#/data-overview",
+ "hasToken": true,
+ "sameOrigin": {
+  "code": 200,
+  "msg": "操作成功",
+  "n": 1236
+ },
+ "omit": {
+  "code": 200,
+  "msg": "操作成功",
+  "n": 1236
+ },
+ "cookie": "",
+ "noXUser": {
+  "code": 200,
+  "n": 1236
+ }
+}

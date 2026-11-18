@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>路线验收方案 · 图解版 v0.1</title>
+<style>
+:root{
+  --bg:#f4f6f9;--card:#fff;--ink:#1e293b;--sub:#64748b;--line:#e2e8f0;
+  --accent:#0e7490;--accent2:#155e75;
+  --ok:#15803d;--okbg:#f0fdf4;--okline:#86efac;
+  --warn:#b45309;--warnbg:#fffbeb;--warnline:#fcd34d;
+  --bad:#b91c1c;--badbg:#fef2f2;--badline:#fca5a5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
+nav{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px;padding:10px 16px;flex-wrap:wrap;box-shadow:0 1px 5px rgba(15,23,42,.05)}
+.brand{font-weight:800;font-size:15px;color:var(--accent);margin-right:8px;white-space:nowrap}
+nav button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 11px;font-size:13px;color:var(--sub);cursor:pointer;font-family:inherit}
+nav button:hover{border-color:var(--accent);color:var(--accent)}
+nav button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+nav .spacer{flex:1}
+main{max-width:1060px;margin:0 auto;padding:26px 20px 40px}
+.screen{display:none}
+.screen.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.kicker{color:var(--accent);font-size:13px;font-weight:700;letter-spacing:.06em;margin-bottom:2px}
+h1{font-size:27px;line-height:1.3}
+h2{font-size:22px;margin-bottom:2px}
+.sub{color:var(--sub);font-size:14px;margin:4px 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+.card h3{font-size:15.5px;margin-bottom:10px}
+.note{font-size:13px;color:var(--sub)}
+.warnbox{background:var(--warnbg);border:1px solid var(--warnline);border-radius:10px;padding:10px 14px;font-size:13.5px}
+.infobox{background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;padding:10px 14px;font-size:13.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cards5{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:900px){.grid2,.grid3,.cards5{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f8fafc;font-weight:600;white-space:nowrap}
+.hero3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}
+@media(max-width:900px){.hero3{grid-template-columns:1fr}}
+.hero3 .h{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:12px;padding:14px 16px;text-align:center}
+.hero3 .b{font-size:16px;font-weight:700}
+.hero3 .s{font-size:12.5px;color:var(--sub);margin-top:4px}
+.flow{display:flex;align-items:stretch;flex-wrap:wrap;justify-content:center;margin:12px 0 8px;gap:4px}
+.flow .step{background:#fff;border:1.5px solid var(--accent);border-radius:10px;padding:9px 12px;min-width:128px;text-align:center}
+.flow .step .t{font-weight:700;font-size:13.5px;color:var(--accent2)}
+.flow .step .d{font-size:11px;color:var(--sub);margin-top:3px;line-height:1.45}
+.flow .arr{align-self:center;font-size:19px;color:var(--accent);padding:0 5px;font-weight:700}
+.flow .src{border-style:dashed;border-color:#94a3b8;min-width:150px}
+.flow .src .t{color:var(--sub)}
+.chip{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+.tag-ok{background:var(--okbg);color:var(--ok);border:1px solid var(--okline)}
+.tag-warn{background:var(--warnbg);color:var(--warn);border:1px solid var(--warnline)}
+.tag-bad{background:var(--badbg);color:var(--bad);border:1px solid var(--badline)}
+.fig{width:100%;height:auto;display:block}
+.fig .axis{stroke:#94a3b8;stroke-width:1.5}
+.fig .grid{stroke:#e2e8f0;stroke-width:1}
+.fig text{font-family:inherit}
+/* 路线怎么跑 */
+.run{display:flex;align-items:center;flex-wrap:wrap;justify-content:center;margin:8px 0 4px}
+.rnode{border:2px solid var(--accent);background:#ecfeff;border-radius:12px;padding:8px 12px;text-align:center;min-width:82px}
+.rnode.gray{border-color:#94a3b8;background:#f8fafc}
+.rnode .t{font-weight:700;font-size:13.5px;color:var(--accent2)}
+.rnode.gray .t{color:var(--sub)}
+.rnode .d{font-size:10.5px;color:var(--sub);line-height:1.4;margin-top:2px}
+.seg{flex:1;min-width:62px;text-align:center;padding:0 6px}
+.seg .lab{font-size:11px;color:var(--sub);margin-bottom:3px;white-space:nowrap}
+.seg .bar{height:0;border-top:2px solid #94a3b8;position:relative}
+.seg .bar:after{content:"";position:absolute;right:-2px;top:-5px;width:0;height:0;border:5px solid transparent;border-left:8px solid #94a3b8}
+.seg.rev .bar:after{right:auto;left:-2px;border-left:none;border-right:8px solid #94a3b8}
+.seg.dash .bar{border-top-style:dashed;border-top-color:#cbd5e1}
+.seg.dash .bar:after{border-left-color:#cbd5e1}
+.seg.rev.dash .bar:after{border-right-color:#cbd5e1}
+.tl{display:flex;height:48px;border-radius:10px;overflow:hidden;border:1px solid var(--line);font-size:11.5px;color:#fff;font-weight:600;margin-top:8px}
+.tl div{display:flex;align-items:center;justify-content:center;text-align:center;padding:2px 4px;line-height:1.35}
+/* 40 点阵 */
+#dots{display:grid;grid-template-columns:repeat(8,36px);gap:7px;justify-content:center}
+@media(max-width:520px){#dots{grid-template-columns:repeat(8,min(9.5vw,36px));gap:5px}}
+.dot{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-size:12px;color:var(--sub);cursor:pointer;font-family:inherit;padding:0}
+#dots .dot{width:100%}
+.dot:hover{border-color:var(--accent)}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff;font-weight:700}
+.counter{font-size:30px;font-weight:800;text-align:center;margin:12px 0 0}
+.counter small{font-size:14px;color:var(--sub);font-weight:600}
+.verdict{border-radius:12px;padding:12px 16px;margin-top:12px}
+.verdict b{font-size:17px;display:block}
+.verdict span{font-size:12.5px;display:block;margin-top:2px}
+.v-ok{background:var(--okbg);border:1.5px solid var(--okline)}.v-ok b{color:var(--ok)}
+.v-warn{background:var(--warnbg);border:1.5px solid var(--warnline)}.v-warn b{color:var(--warn)}
+.v-bad{background:var(--badbg);border:1.5px solid var(--badline)}.v-bad b{color:var(--bad)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.btn{border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:6px 12px;font-size:12.5px;color:var(--ink);cursor:pointer;font-family:inherit;font-weight:600}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.toggle:hover{border-color:var(--bad);color:var(--bad)}
+.btn.on{background:var(--bad);border-color:var(--bad);color:#fff}
+/* 甘特 */
+.grow{display:grid;grid-template-columns:104px 1fr;gap:10px;align-items:center;margin:7px 0}
+.glab{font-size:12.5px;font-weight:600;color:var(--sub);text-align:right}
+.gtrack{position:relative;height:32px;background:#eef2f7;border-radius:8px}
+.gbar{position:absolute;top:3px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;white-space:nowrap;overflow:hidden;font-weight:600}
+.c15{background:#0284c7}.c25{background:#6366f1}.c40{background:#db2777}
+.gaxis{display:grid;grid-template-columns:104px 1fr;gap:10px;margin-top:2px}
+.gaxis .ticks{position:relative;height:16px;font-size:10.5px;color:var(--sub)}
+.gaxis .ticks span{position:absolute;transform:translateX(-50%)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+@media(max-width:800px){.days{grid-template-columns:repeat(2,1fr)}}
+.day{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;background:#fff}
+.day b{display:block;font-size:12.5px;color:var(--accent2)}
+.day.hl{border-color:var(--accent);background:#ecfeff}
+/* 状态机 */
+.nd rect{fill:#fff;stroke:#64748b;stroke-width:1.8}
+.nd text{font-size:12.5px;fill:#1e293b;text-anchor:middle;font-weight:600}
+.nd.ok rect{fill:#f0fdf4;stroke:#16a34a}.nd.ok .tt{fill:#15803d;font-weight:700}
+.nd.warn rect{fill:#fffbeb;stroke:#d97706}.nd.warn .tt{fill:#b45309;font-weight:700}
+.nd.bad rect{fill:#fef2f2;stroke:#dc2626}.nd.bad .tt{fill:#b91c1c;font-weight:700}
+.nd.info rect{fill:#ecfeff;stroke:#0e7490}
+.ts{font-size:10.5px;fill:#64748b;font-weight:400}
+.ar{fill:none;stroke:#64748b;stroke-width:1.6;marker-end:url(#ah)}
+.arRed{stroke:#b91c1c;marker-end:url(#ahr)}
+.alab{font-size:11px;fill:#64748b}
+.okT{fill:#15803d}.badT{fill:#b91c1c}.warnT{fill:#b45309}
+/* 五证卡 */
+.ev{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.ev .no{display:inline-block;background:var(--accent);color:#fff;border-radius:8px;font-size:12px;font-weight:700;padding:1px 8px;margin-bottom:6px}
+.ev h4{font-size:14.5px;margin-bottom:6px}
+.ev p{font-size:12.5px}
+.ev .sig{margin-top:8px;font-size:12px;background:var(--badbg);border:1px dashed var(--badline);border-radius:8px;padding:6px 9px;color:var(--bad)}
+/* 分页 */
+.pager{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:26px}
+.pager button{padding:8px 18px;font-size:13.5px;border-radius:10px;border:1.5px solid var(--accent);background:#fff;color:var(--accent);cursor:pointer;font-family:inherit;font-weight:600}
+.pager button:hover:not(:disabled){background:var(--accent);color:#fff}
+.pager button:disabled{opacity:.35;cursor:default}
+#pgno{color:var(--sub);font-size:13px;font-weight:600}
+/* 词汇表 */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.overlay[hidden]{display:none}
+.panel{background:#fff;border-radius:16px;max-width:700px;width:100%;max-height:82vh;overflow:auto;padding:22px 24px;position:relative}
+.panel h3{margin-bottom:12px;color:var(--accent2)}
+.close{position:absolute;top:10px;right:12px;border:none;background:#f1f5f9;border-radius:8px;width:30px;height:30px;font-size:15px;cursor:pointer;font-family:inherit}
+.foot{color:var(--sub);font-size:12px;text-align:center;margin-top:22px}
+@media print{nav,.pager,.overlay{display:none}.screen{display:block!important}}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">路线验收 · 图解版</span>
+  <button class="tab">① 总览</button>
+  <button class="tab">② 怎么跑</button>
+  <button class="tab">③ 怎么判</button>
+  <button class="tab">④ 为何 40·8</button>
+  <button class="tab">⑤ 排产</button>
+  <button class="tab">⑥ 判定</button>
+  <button class="tab">⑦ 五证</button>
+  <span class="spacer"></span>
+  <button id="glossOpen">词汇表</button>
+</nav>
+
+<main>
+
+<!-- ============ 第①屏 总览 ============ -->
+<section class="screen">
+  <div class="kicker">第①屏 · 总览</div>
+  <h1>路线验收方案，三句话说清</h1>
+  <div class="sub">一条点到点路线（起点 O → 途经点 → 终点 D）怎么跑、怎么判、为什么靠得住 · v0.1 · 2026-10-09</div>
+
+  <div class="hero3">
+    <div class="h"><div class="b">① 一条路线跑一个来回</div><div class="s">单程路线只跑一遍（d=1）；往返来回各一遍（d=2），同一车次连续完成</div></div>
+    <div class="h"><div class="b">② 路上查三类点</div><div class="s">端点（致命）· 灯控锚（关键）· 段落点位（一般）</div></div>
+    <div class="h"><div class="b">③ 毛病够少即合格</div><div class="s">不合格点位 ≤ 8/40，且端点、锚点全过</div></div>
+  </div>
+
+  <div class="card">
+    <h3>流程总图：四步出一条路线的验收结论</h3>
+    <div class="flow">
+      <div class="step src"><div class="t">路线集（输入）</div><div class="d">来源不限：客户 O-D 清单 / 路网生成 / 场景专项 / 数据底座推荐路线集</div></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="t">① 取路建档</div><div class="d">导航取路 → 走廊路段 + 要素清单 + 锚点清单 + 基线快照（冻结）</div></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="t">② 拆三张工单</div><div class="d">端点·全检 / 锚点·全检 / 段落·抽样（40 点位清单固定）</div></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="t">③ 一次出车跑完</div><div class="d">起点确认 → 去程 → 终点确认 → 返程；单程只跑去程，中间不换车</div></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="t">④ 离线判读</div><div class="d">端点 / 锚点 / 40 点位 → 出 verdict 与验收记录</div></div>
+    </div>
+    <div style="text-align:center;margin-top:6px">
+      <span class="chip tag-ok">通过 · 归档</span>&nbsp;&nbsp;
+      <span class="chip tag-warn">存疑 · 重抽 40 合并判读</span>&nbsp;&nbsp;
+      <span class="chip tag-bad">不合格 · 返工失败项</span>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <div class="card"><h3>端点 · 致命</h3>
+      <p class="note">起终点 / 途经点的<b>可停靠、进出通道、掉头空间</b>。<br><br>
+      <b>方式：</b>100% 全检 · 现场静态确认，各 10 min，拍照留档。<br><br>
+      <b>为什么全查：</b>数量少、一票否决——任一不过，整条路线不通过。</p></div>
+    <div class="card"><h3>锚点 · 关键</h3>
+      <p class="note">路线走廊内<b>全部灯控停止线 / 信号灯</b>。<br><br>
+      <b>方式：</b>100% 全检 · 用采集数据判读。<br><br>
+      <b>为什么全查：</b>穷举得起的一律全检——漏检率为 0，不需要抽样论证。</p></div>
+    <div class="card"><h3>段落 · 一般</h3>
+      <p class="note">标线线型 / 颜色、车道数 / 属性、限速等。<br><br>
+      <b>方式：</b>每条路线抽 <b>40 个点位</b>判读 · 按路段长度分层随机。<br><br>
+      <b>为什么抽样：</b>全查查不起——抽样就必须给出统计证明（第④屏）。</p></div>
+  </div>
+
+  <div class="infobox"><b>采集是全长的，抽样只在判读环节。</b>按方向把整条路线跑完（里程覆盖 100%），回来后从采集数据里抽 40 个点位判读——不是"只跑抽中的路段"。</div>
+  <div style="height:10px"></div>
+  <div class="warnbox"><b>验收成立三要素（缺一即为摸底，不是验收）：</b>判据有出处（阈值引 ODD 定义 / 要素规范 / 客户准则）· 抽样有证明（误判概率说得清）· 方案先冻结（开测前签字，期内不改）。</div>
+  <div style="height:10px"></div>
+  <p class="note">上承《川行无人车智驾验收测试标准》单路线交付验收流程（方法层增补，既有准出条款不动）；路线集全部完成路线验收后，才进入区域验收（开区准出）。统计口径与出处见技术底稿 <code>docs/route_acceptance_plan.md</code>。</p>
+</section>
+
+<!-- ============ 第②屏 怎么跑 ============ -->
+<section class="screen">
+  <div class="kicker">第②屏 · 怎么跑</div>
+  <h2>一条路线，一次出车跑完</h2>
+  <div class="sub">端点静态确认 + 全长行驶采集，同一车次连续完成，中间不换车（保证采集条件一致）</div>
+
+  <div class="card">
+    <h3>出车动线（往返型 d=2）</h3>
+    <div class="run">
+      <div class="rnode gray"><div class="t">基地</div><div class="d">出发</div></div>
+      <div class="seg dash" style="min-width:48px"><div class="lab">空驶</div><div class="bar"></div></div>
+      <div class="rnode"><div class="t">起点 O</div><div class="d">静态确认 10 min<br>可停靠·进出·掉头·拍照</div></div>
+      <div class="seg"><div class="lab">去程 · 全长采集</div><div class="bar"></div></div>
+      <div class="rnode"><div class="t">途经点</div><div class="d">静态确认<br>拍照留档</div></div>
+      <div class="seg"><div class="lab">全长采集</div><div class="bar"></div></div>
+      <div class="rnode"><div class="t">终点 D</div><div class="d">静态确认 10 min<br>可停靠·进出·掉头·拍照</div></div>
+    </div>
+    <div style="height:12px"></div>
+    <div class="run">
+      <div class="rnode"><div class="t">终点 D</div><div class="d">原车原位</div></div>
+      <div class="seg rev"><div class="lab">返程 · 全长采集</div><div class="bar"></div></div>
+      <div class="rnode"><div class="t">途经点</div><div class="d">途经确认</div></div>
+      <div class="seg rev"><div class="lab">全长采集</div><div class="bar"></div></div>
+      <div class="rnode"><div class="t">起点 O</div><div class="d">原车原位</div></div>
+      <div class="seg rev dash" style="min-width:48px"><div class="lab">空驶收车</div><div class="bar"></div></div>
+      <div class="rnode gray"><div class="t">基地</div><div class="d">收车</div></div>
+    </div>
+    <p class="note" style="margin-top:10px">单程路线（d=1）只跑去程。往返（d=2）来回各跑一遍，同一车次连续完成。</p>
+  </div>
+
+  <div class="card">
+    <h3>单条出车的耗时长在哪</h3>
+    <div class="tl">
+      <div style="width:16%;background:#94a3b8">空驶<br>基地↔起点</div>
+      <div style="width:15%;background:var(--accent)">端点静态确认<br>2 × 10 min</div>
+      <div style="width:55%;background:#0369a1">行驶采集 = 导航时长 × 方向数</div>
+      <div style="width:14%;background:#94a3b8">空驶<br>挪车</div>
+    </div>
+    <p class="note" style="margin-top:8px">按 6 小时有效窗口排班。配车按<b>起点聚类</b>派车——空驶可差 1.5–2 倍；<b>同一路线不拆车</b>。</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>多长的路线，一天能跑几条</h3>
+      <table>
+        <tr><th>路线长度（往返）</th><th>单条耗时</th><th>6h 窗口可跑</th></tr>
+        <tr><td>15 km</td><td>≈ 1.6 h（行驶 1.0 + 确认 0.33 + 空驶 0.27）</td><td><b>4 条</b></td></tr>
+        <tr><td>25 km</td><td>≈ 2.3 h</td><td><b>2–3 条</b></td></tr>
+        <tr><td>40 km</td><td>≈ 3.3 h</td><td><b>1–2 条</b></td></tr>
+      </table>
+    </div>
+    <div class="card"><h3>什么时候跑</h3>
+      <p class="note"><b>默认只用平峰：</b>9:30–11:30 / 14:00–16:30。<br><br>
+      ODD 含高峰 / 夜间 → <b>同一条路线加跑</b>，里程与工时近似线性增加；夜间判读需人工复核。<br><br>
+      雨天 / 长假前后 / 已知施工期 → 改期。<br><br>
+      <b>排期顺序：</b>先排窗口稀缺的（夜间 / 高峰）→ 平峰填空 → 天气敏感项最后。</p>
+    </div>
+  </div>
+  <p class="note">采集按方向跑完整条 → 里程覆盖 100%；回来判读时才抽 40 个点位（第③屏）。</p>
+</section>
+
+<!-- ============ 第③屏 怎么判 ============ -->
+<section class="screen">
+  <div class="kicker">第③屏 · 怎么判</div>
+  <h2>40 个点位里，毛病够少即合格</h2>
+  <div class="sub">点下面的格子试试——把格子点成「不合格」，看判定怎么变（这就是判读员干的事）</div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>试判台：40 点位</h3>
+      <div id="dots"></div>
+      <div class="counter"><span id="cnt">0</span><small> / 40 不合格点位</small></div>
+      <div class="verdict v-ok" id="verdict"><b>合格</b><span>端点全过 + 锚点全过 + 不合格点位 0/40 ≤ 8。毛病够少，归档。</span></div>
+      <div class="btnrow">
+        <button class="btn" id="btnReset" type="button">清零重来</button>
+        <button class="btn" id="btnGood" type="button">试 · 好路（3 处毛病）</button>
+        <button class="btn" id="btnBadR" type="button">试 · 差路（15 处毛病）</button>
+      </div>
+      <div class="btnrow">
+        <button class="btn toggle" id="epFail" type="button">端点 fail（一票否决）</button>
+        <button class="btn toggle" id="anFail" type="button">锚点 fail（一票否决）</button>
+      </div>
+      <p class="note" style="margin-top:12px">40 个点位怎么抽：<b>按路段长度分层随机</b>——长路段多抽几个、短路段少抽，不是纯随机撒点。</p>
+    </div>
+    <div class="card">
+      <h3>判定规则（单路线 verdict）</h3>
+      <table>
+        <tr><th>verdict</th><th>条件</th><th>动作</th></tr>
+        <tr><td><span class="chip tag-ok">合格</span></td><td>端点全过 且 锚点全过 且 不合格点位 ≤ 8/40</td><td>归档</td></tr>
+        <tr><td><span class="chip tag-warn">存疑（复测）</span></td><td>不合格点位 9–12</td><td>重抽 40 点位合并判读；合并后仍 &gt; 8 → 不合格</td></tr>
+        <tr><td><span class="chip tag-bad">不合格</span></td><td>不合格点位 &gt; 12，或端点 / 锚点任一 fail</td><td>返工<b>失败项</b>（不是整条重跑），复验只补失败项</td></tr>
+      </table>
+      <p class="note" style="margin-top:10px">端点、锚点是<b>全检项</b>——不在 40 个格子里，单独成行；任一 fail 直接一票否决，点多少格子都没用（试试上面两个红色按钮）。</p>
+      <p class="note" style="margin-top:8px">路线状态机：未跑 → 已跑 → 存疑 → 通过 / 返工中 → 不通过（第⑥屏）。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 第④屏 为何 40·8 ============ -->
+<section class="screen">
+  <div class="kicker">第④屏 · 为何是 40 个点、判 8</div>
+  <h2>两个问题分开看：抽得准吗？判得对吗？</h2>
+  <div class="sub">「抽得准」问 40 个点能不能代表整条路；「判得对」问判错的风险有多大。两件事都用数字回答，不用感觉</div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>问题一 · 抽得准吗——误差带随点数收窄</h3>
+      <svg viewBox="0 0 540 320" class="fig" role="img" aria-label="误差带曲线">
+        <line x1="70" y1="270" x2="500" y2="270" class="axis"/>
+        <line x1="70" y1="30" x2="70" y2="270" class="axis"/>
+        <line x1="70" y1="184.3" x2="500" y2="184.3" class="grid"/>
+        <line x1="70" y1="98.6" x2="500" y2="98.6" class="grid"/>
+        <line x1="142.3" y1="30" x2="142.3" y2="270" class="grid"/>
+        <line x1="214.5" y1="30" x2="214.5" y2="270" class="grid"/>
+        <line x1="344.6" y1="30" x2="344.6" y2="270" class="grid"/>
+        <line x1="500" y1="30" x2="500" y2="270" class="grid"/>
+        <text x="62" y="274" font-size="11" fill="#64748b" text-anchor="end">0</text>
+        <text x="62" y="188" font-size="11" fill="#64748b" text-anchor="end">±5</text>
+        <text x="62" y="102" font-size="11" fill="#64748b" text-anchor="end">±10</text>
+        <text x="70" y="288" font-size="11" fill="#64748b" text-anchor="middle">20</text>
+        <text x="142" y="288" font-size="11" fill="#64748b" text-anchor="middle">40</text>
+        <text x="214" y="288" font-size="11" fill="#64748b" text-anchor="middle">60</text>
+        <text x="344" y="288" font-size="11" fill="#64748b" text-anchor="middle">96</text>
+        <text x="500" y="288" font-size="11" fill="#64748b" text-anchor="middle">139</text>
+        <text x="285" y="308" font-size="12" fill="#475569" text-anchor="middle">抽检点位数 n</text>
+        <text x="70" y="20" font-size="11.5" fill="#64748b">误差带（± 个百分点 · 95% 置信）</text>
+        <path d="M70,47.1 C95,85 120,104 142.3,115.7 C170,130 190,135 214.5,139.7 C255,148 300,157 344.6,167.1 C400,177.5 455,182 500,184.3" fill="none" stroke="#0e7490" stroke-width="2.5"/>
+        <circle cx="70" cy="47.1" r="4" fill="#94a3b8"/>
+        <circle cx="214.5" cy="139.7" r="4" fill="#94a3b8"/>
+        <circle cx="344.6" cy="167.1" r="4" fill="#94a3b8"/>
+        <circle cx="500" cy="184.3" r="4" fill="#94a3b8"/>
+        <circle cx="142.3" cy="115.7" r="11" fill="none" stroke="#0e7490" stroke-width="1.5"/>
+        <circle cx="142.3" cy="115.7" r="5.5" fill="#0e7490"/>
+        <text x="80" y="42" font-size="11" fill="#64748b">±13</text>
+        <text x="153" y="111" font-size="12" font-weight="700" fill="#0e7490">±9</text>
+        <text x="223" y="133" font-size="11" fill="#64748b">±7.6</text>
+        <text x="353" y="161" font-size="11" fill="#64748b">±6</text>
+        <text x="494" y="177" font-size="11" fill="#64748b" text-anchor="end">±5</text>
+        <text x="95" y="160" font-size="11.5" font-weight="700" fill="#155e75">◀ 本方案 40 个点 → 误差带 ±9</text>
+      </svg>
+      <p class="note">误差带 ∝ 1/√点数：<b>点数翻 4 倍，误差才减一半</b>。想压到 ±5 要 139 个点——不划算。所以本方案不追求把误差带抽窄，而是用「判 8」控制两头风险（右图）。端点 / 锚点是全检，没有这个问题——漏检率为 0。</p>
+    </div>
+    <div class="card">
+      <h3>问题二 · 判得对吗——错判概率</h3>
+      <svg viewBox="0 0 540 320" class="fig" role="img" aria-label="错判概率柱状图">
+        <line x1="70" y1="270" x2="500" y2="270" class="axis"/>
+        <line x1="70" y1="215" x2="500" y2="215" class="grid"/>
+        <line x1="70" y1="160" x2="500" y2="160" class="grid"/>
+        <line x1="70" y1="105" x2="500" y2="105" class="grid"/>
+        <line x1="70" y1="50" x2="500" y2="50" class="grid"/>
+        <text x="62" y="274" font-size="11" fill="#64748b" text-anchor="end">0%</text>
+        <text x="62" y="219" font-size="11" fill="#64748b" text-anchor="end">25%</text>
+        <text x="62" y="164" font-size="11" fill="#64748b" text-anchor="end">50%</text>
+        <text x="62" y="109" font-size="11" fill="#64748b" text-anchor="end">75%</text>
+        <text x="62" y="54" font-size="11" fill="#64748b" text-anchor="end">100%</text>
+        <rect x="95" y="12" width="14" height="14" rx="3" fill="#0e7490"/>
+        <text x="114" y="24" font-size="11.5" fill="#475569">抽 40 · 判 8（本方案）</text>
+        <rect x="300" y="12" width="14" height="14" rx="3" fill="#f59e0b"/>
+        <text x="319" y="24" font-size="11.5" fill="#475569">只抽 20 · 判 4（筛查用）</text>
+        <rect x="95" y="53.5" width="78" height="216.5" rx="6" fill="#0e7490"/>
+        <rect x="185" y="59.5" width="78" height="210.5" rx="6" fill="#f59e0b"/>
+        <rect x="315" y="245.6" width="78" height="24.4" rx="5" fill="#0e7490"/>
+        <rect x="405" y="217.9" width="78" height="52.1" rx="5" fill="#f59e0b"/>
+        <text x="134" y="47" font-size="12" font-weight="700" fill="#155e75" text-anchor="middle">98.4%</text>
+        <text x="224" y="53" font-size="12" fill="#92400e" text-anchor="middle">95.7%</text>
+        <text x="354" y="239" font-size="12" font-weight="700" fill="#155e75" text-anchor="middle">11.1%</text>
+        <text x="444" y="211" font-size="12" font-weight="700" fill="#b91c1c" text-anchor="middle">23.7%</text>
+        <text x="444" y="196" font-size="10.5" fill="#b91c1c" text-anchor="middle">≈ 每 4 条坏路放过 1 条</text>
+        <text x="179" y="292" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">真不合格率 10% —— 好路</text>
+        <text x="179" y="308" font-size="11" fill="#15803d" text-anchor="middle">两边都大概率判过 ✓</text>
+        <text x="399" y="292" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">真不合格率 30% —— 差路</text>
+        <text x="399" y="308" font-size="11" fill="#b91c1c" text-anchor="middle">本方案拦得住；只抽 20 拦不住 ✗</text>
+      </svg>
+      <p class="note">抽 40 判 8：好路 <b>98.4%</b> 判过（冤枉率 1.6%）；差路只有 <b>11.1%</b> 蒙混（漏放率 11%）。<br>只抽 20 判 4：差路漏放 <b>23.7%</b>——每 4 条坏路线放过 1 条，只能当开测前的快速筛查，<b>不能作验收依据</b>。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>读数表：真实不合格率不同时，判成「合格」的概率</h3>
+    <table>
+      <tr><th>真实不合格率</th><th>抽 40 · 判 8（本方案）</th><th>只抽 20 · 判 4（只能筛查）</th></tr>
+      <tr><td>5%</td><td>≥ 99.9% 通过</td><td>99.8% 通过</td></tr>
+      <tr><td><b>10%（可接受线）</b></td><td><b>98.4% 通过</b>（冤枉 1.6%）</td><td>95.7% 通过</td></tr>
+      <tr><td>20%</td><td>59.2% 通过</td><td>63.0% 通过</td></tr>
+      <tr><td><b>30%（拒绝线）</b></td><td><b>11.1% 通过</b>（漏放 11%）</td><td><b>23.7% 通过</b>（漏放 24%）</td></tr>
+      <tr><td>50%</td><td>0.01% 通过</td><td>0.6% 通过</td></tr>
+    </table>
+    <p class="note" style="margin-top:8px">名词黑话（误差带 / 冤枉 / 漏放 / 可接受线…）点右上角「词汇表」。</p>
+  </div>
+</section>
+
+<!-- ============ 第⑤屏 排产 ============ -->
+<section class="screen">
+  <div class="kicker">第⑤屏 · 排产</div>
+  <h2>10 条路线示例批次：2 车 × 2 天出车，2 人 × 3 天判读</h2>
+  <div class="sub">示例批次 = 4×15 km + 4×25 km + 2×40 km（全部往返）= 验收里程 480 km</div>
+
+  <div class="card">
+    <h3>出车甘特（示意排布，6 小时有效窗口）</h3>
+    <div class="grow"><div class="glab">车A · 第1天</div><div class="gtrack">
+      <div class="gbar c15" style="left:0%;width:22.9%">R01·15km</div>
+      <div class="gbar c15" style="left:22.9%;width:22.9%">R02·15km</div>
+      <div class="gbar c15" style="left:45.7%;width:22.9%">R03·15km</div>
+      <div class="gbar c15" style="left:68.6%;width:22.9%">R04·15km</div>
+    </div></div>
+    <div class="grow"><div class="glab">车B · 第1天</div><div class="gtrack">
+      <div class="gbar c25" style="left:0%;width:32.9%">R05·25km</div>
+      <div class="gbar c25" style="left:32.9%;width:32.9%">R07·25km</div>
+    </div></div>
+    <div class="grow"><div class="glab">车A · 第2天</div><div class="gtrack">
+      <div class="gbar c25" style="left:0%;width:32.9%">R06·25km</div>
+      <div class="gbar c25" style="left:32.9%;width:32.9%">R08·25km</div>
+    </div></div>
+    <div class="grow"><div class="glab">车B · 第2天</div><div class="gtrack">
+      <div class="gbar c40" style="left:0%;width:47.1%">R09·40km</div>
+      <div class="gbar c40" style="left:47.1%;width:47.1%">R10·40km</div>
+    </div></div>
+    <div class="gaxis"><div></div><div class="ticks">
+      <span style="left:0%">0h</span><span style="left:14.3%">1h</span><span style="left:28.6%">2h</span><span style="left:42.9%">3h</span><span style="left:57.1%">4h</span><span style="left:71.4%">5h</span><span style="left:85.7%">6h</span><span style="left:100%">7h</span>
+    </div></div>
+    <div class="legend">
+      <span><i class="c15" style="background:#0284c7"></i>15 km · ≈1.6 h/条</span>
+      <span><i style="background:#6366f1"></i>25 km · ≈2.3 h/条</span>
+      <span><i style="background:#db2777"></i>40 km · ≈3.3 h/条</span>
+    </div>
+    <p class="note" style="margin-top:8px">按起点聚类派车可再压缩空驶；示意排布，实际按路况微调。</p>
+  </div>
+
+  <div class="card">
+    <h3>五个工作日总览</h3>
+    <div class="days">
+      <div class="day"><b>第 1 天</b>出车（车A+车B）· 判读启动</div>
+      <div class="day"><b>第 2 天</b>出车（车A+车B）· 判读</div>
+      <div class="day"><b>第 3 天</b>判读（2 人）</div>
+      <div class="day"><b>第 4 天</b>判读（2 人）</div>
+      <div class="day hl"><b>第 5 天</b>复验 · 批次报告<br><b>≈ 5 个工作日</b></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>总账</h3>
+      <table>
+        <tr><th>项</th><th>数值</th></tr>
+        <tr><td>验收里程</td><td>480 km</td></tr>
+        <tr><td>出车里程</td><td>≈ 650 km（×1.3–1.4，含空驶、端点挪车、复测预留 ~12%）</td></tr>
+        <tr><td>出车工时</td><td>22 h ≈ 2 车 × 2 天</td></tr>
+        <tr><td>判读工时</td><td>33 h ≈ 2 人 × 3 天</td></tr>
+        <tr><td>抽检点位</td><td>400（10 条 × 40）</td></tr>
+        <tr><td>全检项</td><td>40 个端点 + 走廊内全部灯控停止线</td></tr>
+        <tr><td>验证性重复</td><td>抽 2 条路线二次采集（+2.5 h）</td></tr>
+      </table>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;justify-content:center">
+      <div class="warnbox"><b>隐形瓶颈是判读，不是车。</b><br><br>判读工时 ≈ 出车工时 × 1.5。判读人力不足时，<b>加车无效</b>——车越多，积压的判读越多。<br><br>排产先算判读人力，再定出车节奏。</div>
+      <p class="note" style="margin-top:12px">三个里程口径分开记账：验收里程 = Σ(单程 × 方向数)；出车里程 ≈ 验收里程 × 1.3–1.4；复测里程小（返工只补失败项，不重跑全程）。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 第⑥屏 判定 ============ -->
+<section class="screen">
+  <div class="kicker">第⑥屏 · 判定规则</div>
+  <h2>一条路线的状态机 + 一批路线的结论</h2>
+  <div class="sub">不合格不是整条重跑——返工粒度是失败项，复验只补失败项</div>
+
+  <div class="card">
+    <svg viewBox="0 0 920 430" class="fig" role="img" aria-label="单路线判定状态机">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+        <marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b91c1c"/></marker>
+      </defs>
+      <path d="M104,198 H136" class="ar"/>
+      <path d="M240,190 H316" class="ar"/>
+      <path d="M190,176 V72 H792" class="ar"/>
+      <path d="M190,220 V292 H670 V224" class="ar arRed"/>
+      <path d="M385,170 V88 H792" class="ar"/>
+      <path d="M450,198 H646" class="ar arRed"/>
+      <path d="M700,220 V300 H560 V326" class="ar"/>
+      <path d="M460,352 H300 V100 H792" class="ar"/>
+      <path d="M590,352 H796" class="ar arRed"/>
+      <text x="278" y="181" class="alab warnT" text-anchor="middle">9–12</text>
+      <text x="300" y="64" class="alab okT">不合格点位 ≤ 8 · 端点/锚点全过</text>
+      <text x="210" y="286" class="alab badT">＞ 12 · 或 端点/锚点任一 fail（一票否决）</text>
+      <text x="430" y="80" class="alab okT">复测合并后 ≤ 8</text>
+      <text x="548" y="190" class="alab badT" text-anchor="middle">仍 ＞ 8</text>
+      <text x="628" y="294" class="alab" text-anchor="middle">只返工失败项</text>
+      <text x="308" y="268" class="alab okT">复验通过 · 归档</text>
+      <text x="694" y="342" class="alab badT" text-anchor="middle">复验不过 · 终判</text>
+      <g class="nd"><rect x="20" y="176" width="84" height="44" rx="10"/><text x="62" y="203">未跑</text></g>
+      <g class="nd"><rect x="140" y="176" width="100" height="44" rx="10"/><text x="190" y="203">已跑·采集完成</text></g>
+      <g class="nd warn"><rect x="320" y="170" width="130" height="56" rx="10"/><text x="385" y="192" class="tt">存疑（复测）</text><text x="385" y="212" class="ts">重抽 40 点位 · 合并判读</text></g>
+      <g class="nd ok"><rect x="796" y="56" width="104" height="48" rx="10"/><text x="848" y="77" class="tt">通过</text><text x="848" y="94" class="ts">归档</text></g>
+      <g class="nd bad"><rect x="650" y="176" width="104" height="44" rx="10"/><text x="702" y="203" class="tt">不合格</text></g>
+      <g class="nd info"><rect x="460" y="330" width="130" height="44" rx="10"/><text x="525" y="356">返工中（失败项）</text></g>
+      <g class="nd bad"><rect x="800" y="330" width="100" height="44" rx="10"/><text x="850" y="350" class="tt">不通过</text><text x="850" y="366" class="ts">终判</text></g>
+    </svg>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>批次结论（本次全部 N 条路线）</h3>
+      <table>
+        <tr><th>结果</th><th>批次结论</th></tr>
+        <tr><td>N / N 合格</td><td><span class="chip tag-ok">通过</span></td></tr>
+        <tr><td>(N−1) / N 合格</td><td><span class="chip tag-warn">有条件通过</span>——不合格路线整改后复验</td></tr>
+        <tr><td>≤ (N−2) / N 合格</td><td><span class="chip tag-bad">不通过</span>——必须排查<b>系统性原因</b>（数据源、判据、采集设备），不得只修单条</td></tr>
+      </table>
+      <p class="note" style="margin-top:8px">批次大小 N 开测前定死，判定规则随 N 固化。</p>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;justify-content:center">
+      <div class="infobox"><b>返工粒度 = 失败项。</b><br><br>不合格不是整条路线重跑——只返工失败的端点 / 锚点 / 点位；复验也只补这些。所以复测里程小，不爆预算。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 第⑦屏 五证 ============ -->
+<section class="screen">
+  <div class="kicker">第⑦屏 · 有效性五证</div>
+  <h2>怎么证明这套跑法靠得住</h2>
+  <div class="sub">五张证据卡，每张都有「不成立的信号」——出现信号说明方案失效，须修订后重验</div>
+
+  <div class="cards5">
+    <div class="ev"><span class="no">证 1</span><h4>统计检出力</h4>
+      <p>冤枉率 1.6%（好路被误判）、漏放率 11%（差路蒙混）——读数见第④屏。</p>
+      <div class="sig">信号：漏放率 &gt; 20% → 方案过松，须加大样本</div></div>
+    <div class="ev"><span class="no">证 2</span><h4>覆盖证明</h4>
+      <p>端点 + 锚点 100% 全检；采集覆盖 100% 里程；抽检覆盖率 = 40 点位 × 段长 ÷ 路线总长，写入报告。</p>
+      <div class="sig">信号：给不出分子分母</div></div>
+    <div class="ev"><span class="no">证 3</span><h4>可重复性</h4>
+      <p>每批次抽 2 条路线二次采集，两次 verdict 一致率须 100%。</p>
+      <div class="sig">信号：出现不一致 → 判读判据有歧义，修订后重验</div></div>
+    <div class="ev"><span class="no">证 4</span><h4>方案冻结</h4>
+      <p>判据、抽样、判定规则开测前签字冻结；期内不更改，变更走变更记录。</p>
+      <div class="sig">信号：测试中调阈值 → 结论作废</div></div>
+    <div class="ev"><span class="no">证 5</span><h4>可追溯</h4>
+      <p>基线快照、原始采集数据、逐项判读记录、verdict 全部归档，第三方可复核。</p>
+      <div class="sig">信号：判读结论回溯不到原始数据</div></div>
+    <div class="ev" style="border-color:var(--accent)"><span class="no">待确认</span><h4>开测前必须闭环的 4 件事</h4>
+      <p>① <b>判据阈值</b>（唯一外部输入）：须引自 ODD 定义 / 要素规范 / 客户准则；未确认前可采集，<b>不得出「合格」结论</b><br>
+      ② 方向（单程 / 往返）与时段窗口数——每加一个窗口，成本近似翻倍<br>
+      ③ 判读人力配置——判读 ≈ 出车 × 1.5，是隐形瓶颈<br>
+      ④ 批次大小 N——判定规则随 N 固化</p></div>
+  </div>
+
+  <p class="note" style="margin-top:12px">每条路线归档四组字段——基线 / 采集 / 判读 / 结论（明细见技术底稿 §8）；缺项视为未完成验收。</p>
+</section>
+
+<div class="pager">
+  <button id="prevB" type="button">‹ 上一屏</button>
+  <span id="pgno">1 / 7</span>
+  <button id="nextB" type="button">下一屏 ›</button>
+</div>
+<p class="foot">图解版 v0.1 · 2026-10-09 · 技术底稿：docs/route_acceptance_plan.md（统计口径与出处以底稿为准）· 键盘 ← / → 可切屏</p>
+</main>
+
+<!-- 词汇表 -->
+<div class="overlay" id="gloss" hidden>
+  <div class="panel">
+    <button class="close" id="glossClose" type="button">×</button>
+    <h3>词汇表 —— 统计黑话 → 人话</h3>
+    <table>
+      <tr><th>词</th><th>人话</th></tr>
+      <tr><td><b>误差带</b></td><td>抽样估出的不合格率，与真实值最多差多少。抽 40 个点 ≈ ±9 个百分点。</td></tr>
+      <tr><td><b>95% 置信</b></td><td>长期这么抽，100 次里约 95 次误差不超过误差带。</td></tr>
+      <tr><td><b>冤枉率</b>（学名 α，生产方风险）</td><td>好路线被误判成不合格的概率。本方案 1.6%。</td></tr>
+      <tr><td><b>漏放率</b>（学名 β，使用方风险）</td><td>坏路线被误判成合格、溜过去的概率。本方案 11%。</td></tr>
+      <tr><td><b>可接受线</b>（学名 AQL）= 10%</td><td>真实不合格率不高于此，算「好路」，应放行。</td></tr>
+      <tr><td><b>拒绝线</b>（学名 LTPD）= 30%</td><td>真实不合格率高于此，算「差路」，必须拦住。</td></tr>
+      <tr><td><b>判定数</b>（学名 Ac）= 8</td><td>40 个点位里，不合格的不超过 8 个仍判合格。</td></tr>
+      <tr><td><b>OC 曲线</b>（检出力曲线）</td><td>真实不合格率取不同值时，这套抽样判定的通过率连成的曲线——第④屏右图就是曲线上的两个点。</td></tr>
+      <tr><td><b>pp</b>（百分点）</td><td>百分数之间的差：30% − 21% = 9 个百分点。</td></tr>
+    </table>
+    <p class="note" style="margin-top:10px">统计口径与出处见技术底稿 docs/route_acceptance_plan.md §4。</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var screens=[].slice.call(document.querySelectorAll('.screen'));
+  var tabs=[].slice.call(document.querySelectorAll('nav .tab'));
+  var prev=document.getElementById('prevB'),next=document.getElementById('nextB'),pgno=document.getElementById('pgno');
+  var cur=0;
+  function show(i){
+    cur=Math.max(0,Math.min(screens.length-1,i));
+    screens.forEach(function(s,k){s.classList.toggle('on',k===cur)});
+    tabs.forEach(function(t,k){t.classList.toggle('on',k===cur)});
+    pgno.textContent=(cur+1)+' / '+screens.length;
+    prev.disabled=(cur===0);next.disabled=(cur===screens.length-1);
+    try{history.replaceState(null,'','#s'+(cur+1));}catch(e){}
+    window.scrollTo(0,0);
+  }
+  tabs.forEach(function(t,k){t.onclick=function(){show(k)}});
+  prev.onclick=function(){show(cur-1)};next.onclick=function(){show(cur+1)};
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight')show(cur+1);else if(e.key==='ArrowLeft')show(cur-1);
+  });
+  var h=(location.hash||'').match(/^#s([1-7])$/);
+  show(h?parseInt(h[1],10)-1:0);
+
+  var gloss=document.getElementById('gloss');
+  document.getElementById('glossOpen').onclick=function(){gloss.hidden=false};
+  document.getElementById('glossClose').onclick=function(){gloss.hidden=true};
+  gloss.addEventListener('click',function(e){if(e.target===gloss)gloss.hidden=true});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')gloss.hidden=true});
+
+  var dotsEl=document.getElementById('dots');
+  var verdictEl=document.getElementById('verdict'),cntEl=document.getElementById('cnt');
+  var epB=document.getElementById('epFail'),anB=document.getElementById('anFail');
+  var bad={};
+  function refresh(){
+    var x=0;for(var k in bad)if(bad[k])x++;
+    cntEl.textContent=x;
+    var cls,label,desc;
+    var epOn=epB.classList.contains('on'),anOn=anB.classList.contains('on');
+    if(epOn||anOn){
+      cls='v-bad';label='不合格（一票否决）';
+      desc=epOn?'端点 fail：起终点/途经点的可停靠、进出、掉头任一不过——整条路线直接不通过，与 40 个点位无关。'
+               :'锚点 fail：走廊内灯控停止线/信号灯有未过项——整条路线直接不通过，与 40 个点位无关。';
+    }else if(x<=8){cls='v-ok';label='合格';desc='端点全过 + 锚点全过 + 不合格点位 '+x+'/40 ≤ 8。毛病够少，归档。';}
+    else if(x<=12){cls='v-warn';label='存疑（复测）';desc='不合格点位 '+x+'/40 落在 9–12：重抽 40 点位合并判读；合并后仍 > 8 → 不合格。';}
+    else{cls='v-bad';label='不合格';desc='不合格点位 '+x+'/40 > 12：返工失败项（不是整条路线重跑），复验只补失败项。';}
+    verdictEl.className='verdict '+cls;
+    verdictEl.innerHTML='<b>'+label+'</b><span>'+desc+'</span>';
+  }
+  for(var i=0;i<40;i++)(function(i){
+    var b=document.createElement('button');b.className='dot';b.type='button';b.textContent=i+1;
+    b.title='点位 '+(i+1)+'：点击切换 合格 / 不合格';
+    b.onclick=function(){bad[i]=!bad[i];b.classList.toggle('bad',!!bad[i]);refresh()};
+    dotsEl.appendChild(b);
+  })(i);
+  function clearDots(){
+    bad={};
+    [].forEach.call(dotsEl.children,function(b){b.classList.remove('bad')});
+    epB.classList.remove('on');anB.classList.remove('on');
+  }
+  function setSample(k){
+    clearDots();
+    var idx=[];for(var i=0;i<40;i++)idx.push(i);
+    for(var j=idx.length-1;j>0;j--){var r=Math.floor(Math.random()*(j+1));var t=idx[j];idx[j]=idx[r];idx[r]=t;}
+    idx.slice(0,k).forEach(function(i){bad[i]=true;dotsEl.children[i].classList.add('bad')});
+    refresh();
+  }
+  document.getElementById('btnReset').onclick=function(){clearDots();refresh()};
+  document.getElementById('btnGood').onclick=function(){setSample(3)};
+  document.getElementById('btnBadR').onclick=function(){setSample(15)};
+  epB.onclick=function(){this.classList.toggle('on');refresh()};
+  anB.onclick=function(){this.classList.toggle('on');refresh()};
+  refresh();
+})();
+</script>
+</body>
+</html>
